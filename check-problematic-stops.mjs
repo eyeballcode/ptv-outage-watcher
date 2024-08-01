@@ -3,6 +3,8 @@ import { default as checkPTVBus } from './lib/check-ptv-bus.mjs'
 import { PTVAPI, PTVAPIInterface } from 'ptv-api'
 import config from './config.json' assert { type: 'json' }
 
+import sendMessage from './discord-api.mjs'
+
 let ptvAPI = new PTVAPI(new PTVAPIInterface(config.devID, config.key))
 
 let problematicBusStops = {
@@ -11,13 +13,14 @@ let problematicBusStops = {
   "Seymour": "42068"
 }
 
-let overallStatus = ''
+let overallStatus = 'Problematic Bus Stops:\n'
 
 for (let stopName of Object.keys(problematicBusStops)) {
   let status = await checkPTVBus(ptvAPI, problematicBusStops[stopName])
 
-  if (status.status == 'Healthy') overallStatus += `${stopName}: Healthy\n`
+  if (status.status === 'Healthy') overallStatus += `${stopName}: Healthy\n`
   else overallStatus += `${stopName}: Unhealthy (${status.code})\n`
 }
 
-console.log(overallStatus)
+if (process.argv[2] == '-c') console.log(overallStatus)
+else await sendMessage(overallStatus)

@@ -4,6 +4,8 @@ import { default as checkPTVBus } from './lib/check-ptv-bus.mjs'
 import { PTVAPI, PTVAPIInterface } from 'ptv-api'
 import config from './config.json' assert { type: 'json' }
 
+import sendMessage from './discord-api.mjs'
+
 let ptvAPI = new PTVAPI(new PTVAPIInterface(config.devID, config.key))
 
 let metroCheckStops = [
@@ -23,6 +25,7 @@ let busCheckStops = [
   21477, // BMS
 ]
 
+let statusReport = ''
 
 let ptvMetro
 for (let stop of metroCheckStops) {
@@ -30,10 +33,10 @@ for (let stop of metroCheckStops) {
   if (ptvMetro.status === 'Healthy') break
 }
 
-if (ptvMetro.status === 'Healthy') console.log('PTV Metro: Healthy')
+if (ptvMetro.status === 'Healthy') statusReport += 'PTV Metro: Healthy\n'
 else {
-  console.log(`PTV Metro: Unhealthy (${ptvMetro.code})`)
-  if ('trackingUnavailable' in ptvMetro) console.log(`PTV Metro: Extended Tracking: ${ptvMetro.trackingUnavailable ? 'Unavailable' : 'Available'}`)
+  statusReport += `PTV Metro: Unhealthy (${ptvMetro.code})\n`
+  if ('trackingUnavailable' in ptvMetro) statusReport += `PTV Metro: Extended Tracking: ${ptvMetro.trackingUnavailable ? 'Unavailable' : 'Available'}\n`
 }
 
 let ptvBus
@@ -42,8 +45,11 @@ for (let stop of busCheckStops) {
   if (ptvBus.status === 'Healthy') break
 }
 
-if (ptvBus.status === 'Healthy') console.log('PTV Bus: Healthy')
+if (ptvBus.status === 'Healthy') statusReport += 'PTV Bus: Healthy\n'
 else {
-  console.log(`PTV Bus: Unhealthy (${ptvBus.code})`)
-  if ('trackingUnavailable' in ptvBus) console.log(`PTV Bus: Extended Tracking: ${ptvMetro.trackingUnavailable ? 'Unavailable' : 'Available'}`)
+  statusReport += `PTV Bus: Unhealthy (${ptvBus.code})\n`
+  if ('trackingUnavailable' in ptvBus) statusReport += `PTV Bus: Extended Tracking: ${ptvMetro.trackingUnavailable ? 'Unavailable' : 'Available'}\n`
 }
+
+if (process.argv[2] == '-c') console.log(statusReport)
+else await sendMessage(statusReport)
