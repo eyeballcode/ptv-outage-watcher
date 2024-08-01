@@ -18,6 +18,10 @@ let overallStatus = 'Problematic Bus Stops:\n'
 for (let stopName of Object.keys(problematicBusStops)) {
   let status = await checkPTVBus(ptvAPI, problematicBusStops[stopName])
 
+  // Having anything is already good enough
+  // Also SEY almost never has data because the buses run so infrequently
+  if (status.status === 'Unhealthy' && status.code === 'NO_LIVE_ETA') status.status = 'Healthy'
+
   if (status.status === 'Healthy') overallStatus += `${stopName}: Healthy\n`
   else overallStatus += `${stopName}: Unhealthy (${status.code})\n`
 }
