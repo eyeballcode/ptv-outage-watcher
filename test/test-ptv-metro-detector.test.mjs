@@ -20,14 +20,14 @@ describe('The PTV Metro Outage detector', () => {
   it('Should return a healthy response when the data is normal', async () => {
     nock('https://timetableapi.ptv.vic.gov.au').get(/\/v3\/departures\/route_type\/0\/.+/).reply(200, stubRegularDepartures)
 
-    let status = await checkPTVMetro(ptvAPI)
+    let status = await checkPTVMetro(ptvAPI, 19902)
     expect(status.status).to.equal('Healthy')
   })
 
   it('Should return an unhealthy response when the op timetable wasn\'t loaded and is using the raw GTFS timetables', async () => {
     nock('https://timetableapi.ptv.vic.gov.au').get(/\/v3\/departures\/route_type\/0\/.+/).reply(200, stubNoOpTimetable)
 
-    let status = await checkPTVMetro(ptvAPI)
+    let status = await checkPTVMetro(ptvAPI, 19902)
     expect(status.status).to.equal('Unhealthy')
     expect(status.code).to.equal('NO_OP_TIMETABLE')
   })
@@ -38,7 +38,7 @@ describe('The PTV Metro Outage detector', () => {
 
     nock('https://timetableapi.ptv.vic.gov.au').get(/\/v3\/departures\/route_type\/0\/.+/).reply(200, timetable)
 
-    let status = await checkPTVMetro(ptvAPI)
+    let status = await checkPTVMetro(ptvAPI, 19902)
     expect(status.status).to.equal('Unhealthy')
     expect(status.code).to.equal('NO_LIVE_ETA')
     expect(status.trackingAvailable).to.be.true
@@ -53,7 +53,7 @@ describe('The PTV Metro Outage detector', () => {
 
     nock('https://timetableapi.ptv.vic.gov.au').get(/\/v3\/departures\/route_type\/0\/.+/).reply(200, timetable)
 
-    let status = await checkPTVMetro(ptvAPI)
+    let status = await checkPTVMetro(ptvAPI, 19902)
     expect(status.status).to.equal('Unhealthy')
     expect(status.code).to.equal('NO_TRACKING')
   })
