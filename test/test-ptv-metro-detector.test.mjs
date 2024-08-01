@@ -6,8 +6,8 @@ import nock from 'nock'
 import { default as checkPTVMetro } from '../lib/check-ptv-metro.mjs'
 import { PTVAPI, PTVAPIInterface } from 'ptv-api'
 
-import stubRegularDepartures from './mock/regular-metro-departures.json' assert { type: 'json' }
-import stubNoOpTimetable from './mock/metro-no-op-timetable.json' assert { type: 'json' }
+import stubRegularDepartures from './mock/regular-metro-departures.json' with { type: 'json' }
+import stubNoOpTimetable from './mock/metro-no-op-timetable.json' with { type: 'json' }
 
 const __filename = url.fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

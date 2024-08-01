@@ -3,8 +3,8 @@ import nock from 'nock'
 import { default as checkPTVBus } from '../lib/check-ptv-bus.mjs'
 import { PTVAPI, PTVAPIInterface } from 'ptv-api'
 
-import stubRegularDepartures from './mock/regular-bus-departures.json' assert { type: 'json' }
-import stubNoOpTimetable from './mock/bus-no-op-timetable.json' assert { type: 'json' }
+import stubRegularDepartures from './mock/regular-bus-departures.json' with { type: 'json' }
+import stubNoOpTimetable from './mock/bus-no-op-timetable.json' with { type: 'json' }
 
 describe('The PTV Bus Outage detector', () => {
   let ptvAPI = new PTVAPI(new PTVAPIInterface('', ''))

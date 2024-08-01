@@ -2,7 +2,7 @@ import { default as checkPTVMetro } from './lib/check-ptv-metro.mjs'
 import { default as checkPTVBus } from './lib/check-ptv-bus.mjs'
 
 import { PTVAPI, PTVAPIInterface } from 'ptv-api'
-import config from './config.json' assert { type: 'json' }
+import config from './config.json' with { type: 'json' }
 
 import sendMessage from './discord-api.mjs'
 
