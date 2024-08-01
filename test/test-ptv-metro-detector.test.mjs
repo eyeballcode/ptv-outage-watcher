@@ -4,6 +4,7 @@ import path from 'path'
 import url from 'url'
 import nock from 'nock'
 import { default as checkPTVMetro } from '../lib/check-ptv-metro.mjs'
+import { PTVAPI, PTVAPIInterface } from 'ptv-api'
 
 import stubRegularDepartures from './mock/regular-metro-departures.json' assert { type: 'json' }
 import stubNoOpTimetable from './mock/metro-no-op-timetable.json' assert { type: 'json' }
@@ -14,17 +15,19 @@ const __dirname = path.dirname(__filename)
 // const gtfsr = (await fs.readFile(path.join(__dirname, 'mock', 'gtfsr-blank-response'))).toString()
 
 describe('The PTV Metro Outage detector', () => {
+  let ptvAPI = new PTVAPI(new PTVAPIInterface('', ''))
+
   it('Should return a healthy response when the data is normal', async () => {
     nock('https://timetableapi.ptv.vic.gov.au').get(/\/v3\/departures\/route_type\/0\/.+/).reply(200, stubRegularDepartures)
 
-    let status = await checkPTVMetro()
+    let status = await checkPTVMetro(ptvAPI)
     expect(status.status).to.equal('Healthy')
   })
 
   it('Should return an unhealthy response when the op timetable wasn\'t loaded and is using the raw GTFS timetables', async () => {
     nock('https://timetableapi.ptv.vic.gov.au').get(/\/v3\/departures\/route_type\/0\/.+/).reply(200, stubNoOpTimetable)
 
-    let status = await checkPTVMetro()
+    let status = await checkPTVMetro(ptvAPI)
     expect(status.status).to.equal('Unhealthy')
     expect(status.code).to.equal('NO_OP_TIMETABLE')
   })
@@ -35,7 +38,7 @@ describe('The PTV Metro Outage detector', () => {
 
     nock('https://timetableapi.ptv.vic.gov.au').get(/\/v3\/departures\/route_type\/0\/.+/).reply(200, timetable)
 
-    let status = await checkPTVMetro()
+    let status = await checkPTVMetro(ptvAPI)
     expect(status.status).to.equal('Unhealthy')
     expect(status.code).to.equal('NO_LIVE_ETA')
     expect(status.trackingAvailable).to.be.true
@@ -50,7 +53,7 @@ describe('The PTV Metro Outage detector', () => {
 
     nock('https://timetableapi.ptv.vic.gov.au').get(/\/v3\/departures\/route_type\/0\/.+/).reply(200, timetable)
 
-    let status = await checkPTVMetro()
+    let status = await checkPTVMetro(ptvAPI)
     expect(status.status).to.equal('Unhealthy')
     expect(status.code).to.equal('NO_TRACKING')
   })

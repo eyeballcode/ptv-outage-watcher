@@ -1,6 +1,10 @@
 import { default as checkPTVMetro } from './lib/check-ptv-metro.mjs'
+import { PTVAPI, PTVAPIInterface } from 'ptv-api'
+import config from './config.json' assert { type: 'json' }
 
-let ptvMetro = await checkPTVMetro()
+let ptvAPI = new PTVAPI(new PTVAPIInterface(config.devID, config.key))
+
+let ptvMetro = await checkPTVMetro(ptvAPI)
 if (ptvMetro.status === 'Healthy') console.log('PTV Metro: Healthy')
 else {
   console.log(`PTV Metro: Unhealthy (${ptvMetro.code})`)
